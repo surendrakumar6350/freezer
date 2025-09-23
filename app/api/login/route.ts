@@ -1,13 +1,62 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
-export async function POST(request: Request) {
-  const { username, password } = await request.json();
+const JWT_SECRET = process.env.JWT_SECRET;
 
-  // Dummy authentication logic
-  if (username === 'admin' && password === 'password') {
-    // Return a dummy token
-    return NextResponse.json({ token: 'dummy-token-123' });
-  }
+function getJwtSecret(): string {
+    if (!JWT_SECRET) {
+        throw new Error('JWT_SECRET environment variable is not set');
+    }
+    return JWT_SECRET;
+}
 
-  return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
+export const dynamic = "force-dynamic";
+
+export async function POST(request: NextRequest): Promise<NextResponse> {
+    try {
+        const body = await request.json();
+        const { username, password } = body;
+
+        const envUsername = process.env.USER_USERNAME;
+        const envPassword = process.env.USER_PASSWORD;
+
+        if (!envUsername || !envPassword) {
+            return NextResponse.json(
+                { success: false, message: "Server misconfiguration: missing credentials" },
+                { status: 500 }
+            );
+        }
+
+        if (username === envUsername && password === envPassword) {
+            const expiresInSeconds = 60 * 60 * 5;
+            const token = jwt.sign({ username }, getJwtSecret(), { expiresIn: expiresInSeconds });
+
+            const response = NextResponse.json({
+                success: true,
+                message: "Logged in successfully",
+                token,
+            });
+
+            response.cookies.set("token", token, {
+                httpOnly: true,
+                path: "/",
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+                maxAge: expiresInSeconds,
+            });
+
+            return response;
+        }
+
+        return NextResponse.json(
+            { success: false, message: "Invalid credentials" },
+            { status: 401 }
+        );
+    } catch (error) {
+        console.error('Login error:', error);
+        return NextResponse.json(
+            { success: false, message: "Server Error" },
+            { status: 500 }
+        );
+    }
 }
