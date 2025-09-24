@@ -64,18 +64,16 @@ function TreeNode({ node, onFileClick, level }: { node: S3Node; onFileClick: (no
   if (node.type === "file") {
     return (
       <div
-        className="group flex items-center px-2 py-1.5 cursor-pointer rounded-lg transition-colors hover:bg-white/5 relative"
+        className="group flex items-center px-2 py-1 cursor-pointer rounded-md transition-colors hover:bg-white/5 relative"
         onClick={() => onFileClick(node)}
       >
         <File className="w-4 h-4 text-blue-400/80 shrink-0" />
         <span className="ml-2 text-sm text-gray-300 truncate">{node.name}</span>
-        
         {/* Info tooltip on hover */}
         <div className="absolute left-full ml-2 hidden group-hover:block bg-[#1E2A3E] text-xs text-gray-300 p-2 rounded-lg shadow-xl border border-[#2A3A52] whitespace-nowrap z-10">
           <div className="mb-1">Size: {formatSize(node.size!)}</div>
           <div>Modified: {formatDate(node.lastModified!)}</div>
         </div>
-
         {/* Metadata (visible on wider screens) */}
         <div className="hidden md:flex ml-auto pl-4 text-xs text-gray-500 shrink-0">
           {formatSize(node.size!)}
@@ -88,7 +86,7 @@ function TreeNode({ node, onFileClick, level }: { node: S3Node; onFileClick: (no
     <div>
       {level > 0 && (
         <button
-          className="flex items-center w-full px-2 py-1.5 rounded-lg transition-colors hover:bg-white/5 group"
+          className="flex items-center w-full px-2 py-1 rounded-md transition-colors hover:bg-white/5 group"
           onClick={() => setOpen((o) => !o)}
         >
           {open ? (
@@ -98,14 +96,12 @@ function TreeNode({ node, onFileClick, level }: { node: S3Node; onFileClick: (no
           )}
           <Folder className="w-4 h-4 text-yellow-400/90 ml-1 shrink-0" />
           <span className="ml-1.5 text-sm text-gray-200 font-medium truncate">{node.name}</span>
-          
           {/* Folder info (items count) */}
-          <span className="ml-auto text-xs text-gray-500 group-hover:text-gray-400">
-            {node.children?.length || 0} items
+          <span className="ml-auto text-[10px] px-1 py-0.5 rounded bg-[#1E2A3E] text-gray-400 group-hover:text-blue-400 group-hover:bg-[#22304a] font-mono font-normal" style={{ minWidth: 0, fontVariantNumeric: 'tabular-nums' }}>
+            {node.children?.length || 0}
           </span>
         </button>
       )}
-      
       {open && node.children && (
         <div className={`ml-${level > 0 ? '4' : '0'} ${level > 0 ? 'border-l border-[#2A3A52]' : ''}`}>
           {node.children
