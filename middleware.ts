@@ -42,6 +42,13 @@ export async function middleware(request: NextRequest) {
 
     console.log(`[${istTime}] ${method} ${url} — IP: ${ip}`);
 
+    if (path === '/') {
+        const isValid = token && await verifyToken(token);
+        if (isValid) {
+            return NextResponse.redirect(new URL('/s3-explorer', request.url));
+        }
+    }
+
     // Protect admin dashboard
     if (path === '/s3-explorer') {
         const isValid = token && await verifyToken(token);
