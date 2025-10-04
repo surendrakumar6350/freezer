@@ -30,7 +30,7 @@ export default function LoginPage() {
       const data = await res.json();
       if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
-        router.push('/');
+        window.location.href = '/';
       } else {
         setError(data.message || 'Login failed');
       }
