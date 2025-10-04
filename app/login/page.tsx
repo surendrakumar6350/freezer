@@ -36,7 +36,7 @@ export default function LoginPage() {
           if (rememberMe) localStorage.setItem('token', data.token);
           else sessionStorage.setItem('token', data.token);
         } catch { }
-        router.push('/');
+        window.location.href = '/';
       } else {
         setError(data.message || 'Login failed');
       }
