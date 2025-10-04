@@ -84,7 +84,7 @@ export default function S3ExplorerPage() {
     <div className="min-h-screen bg-background flex flex-row">
       {/* Sidebar */}
       <div
-        className="relative border-r flex flex-col transition-all duration-200 h-screen max-h-screen order-1 bg-background"
+        className="relative border-r flex flex-col transition-all duration-200 h-screen max-h-screen order-1 bg-[var(--sidebar)]"
         style={{ width: sidebarWidth }}
       >
         {/* Resizer */}
