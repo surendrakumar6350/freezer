@@ -64,20 +64,18 @@ function TreeNode({ node, onFileClick, level }: { node: S3Node; onFileClick: (no
   if (node.type === "file") {
     return (
       <div
-        className="group flex items-center px-2 py-1.5 cursor-pointer rounded-lg transition-colors hover:bg-white/5 relative"
+        className="group flex items-center px-2 py-1 cursor-pointer rounded-md transition-colors hover:bg-sidebar-accent relative"
         onClick={() => onFileClick(node)}
       >
-        <File className="w-4 h-4 text-blue-400/80 shrink-0" />
-        <span className="ml-2 text-sm text-gray-300 truncate">{node.name}</span>
-        
+        <File className="w-4 h-4 text-primary shrink-0" />
+        <span className="ml-2 text-sm text-sidebar-foreground truncate">{node.name}</span>
         {/* Info tooltip on hover */}
-        <div className="absolute left-full ml-2 hidden group-hover:block bg-[#1E2A3E] text-xs text-gray-300 p-2 rounded-lg shadow-xl border border-[#2A3A52] whitespace-nowrap z-10">
+        <div className="absolute left-full ml-2 hidden group-hover:block bg-popover text-xs text-popover-foreground p-2 rounded-lg shadow-xl border whitespace-nowrap z-10">
           <div className="mb-1">Size: {formatSize(node.size!)}</div>
           <div>Modified: {formatDate(node.lastModified!)}</div>
         </div>
-
         {/* Metadata (visible on wider screens) */}
-        <div className="hidden md:flex ml-auto pl-4 text-xs text-gray-500 shrink-0">
+        <div className="hidden md:flex ml-auto pl-4 text-xs text-muted-foreground shrink-0">
           {formatSize(node.size!)}
         </div>
       </div>
@@ -88,26 +86,24 @@ function TreeNode({ node, onFileClick, level }: { node: S3Node; onFileClick: (no
     <div>
       {level > 0 && (
         <button
-          className="flex items-center w-full px-2 py-1.5 rounded-lg transition-colors hover:bg-white/5 group"
+          className="flex items-center w-full px-2 py-1 rounded-md transition-colors hover:bg-sidebar-accent group"
           onClick={() => setOpen((o) => !o)}
         >
           {open ? (
-            <ChevronDown className="w-4 h-4 text-gray-500 shrink-0" />
+            <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-gray-500 shrink-0" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
           )}
-          <Folder className="w-4 h-4 text-yellow-400/90 ml-1 shrink-0" />
-          <span className="ml-1.5 text-sm text-gray-200 font-medium truncate">{node.name}</span>
-          
+          <Folder className="w-4 h-4 text-amber-500 ml-1 shrink-0" />
+          <span className="ml-1.5 text-sm text-sidebar-foreground font-medium truncate">{node.name}</span>
           {/* Folder info (items count) */}
-          <span className="ml-auto text-xs text-gray-500 group-hover:text-gray-400">
-            {node.children?.length || 0} items
+          <span className="ml-auto text-[10px] px-1 py-0.5 rounded bg-sidebar-accent text-muted-foreground group-hover:text-sidebar-primary group-hover:bg-sidebar-primary/10 font-mono font-normal" style={{ minWidth: 0, fontVariantNumeric: 'tabular-nums' }}>
+            {node.children?.length || 0}
           </span>
         </button>
       )}
-      
       {open && node.children && (
-        <div className={`ml-${level > 0 ? '4' : '0'} ${level > 0 ? 'border-l border-[#2A3A52]' : ''}`}>
+        <div className={`ml-${level > 0 ? '4' : '0'} ${level > 0 ? 'border-l border-sidebar-border' : ''}`}>
           {node.children
             .sort((a, b) => {
               // Folders first, then files
