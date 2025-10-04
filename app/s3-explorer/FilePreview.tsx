@@ -16,7 +16,7 @@ export type FilePreviewProps = {
 
 export const FilePreview: React.FC<FilePreviewProps> = ({ url, name, mimeType, content, isInline = false, onClose }) => {
   const type = mimeType || getTypeFromName(name);
-  const icon = getFileIcon(type, name);
+  const icon = getFileIcon(type);
   const ext = name.split('.').pop()?.toLowerCase() || "";
 
   if (isInline) {
@@ -45,6 +45,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({ url, name, mimeType, c
         <div className="w-full p-4 sm:p-6">
           {type.startsWith("image/") ? (
             <div className="relative group">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img 
                 src={url} 
                 alt={name} 
@@ -188,7 +189,7 @@ function getTypeFromName(name: string): string {
   return "";
 }
 
-function getFileIcon(type: string, name: string) {
+function getFileIcon(type: string) {
   if (type.startsWith("image/")) return <FaFileImage />;
   if (type.startsWith("video/")) return <FaFileVideo />;
   if (type.startsWith("audio/")) return <FaFileAudio />;

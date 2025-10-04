@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 
-import { buildTree, S3File, S3Node } from "./FileTree";
+import { buildTree, S3Node } from "./FileTree";
 import { FilePreview } from "./FilePreview";
 import { Sidebar } from "../../components/s3-explorer/Sidebar";
 import { WelcomeCard } from "../../components/s3-explorer/WelcomeCard";
@@ -11,7 +11,6 @@ import { PanelLeft, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function S3ExplorerPage() {
-  const [files, setFiles] = useState<S3File[]>([]);
   const [tree, setTree] = useState<S3Node | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -23,7 +22,6 @@ export default function S3ExplorerPage() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          setFiles(data.files);
           setTree(buildTree(data.files));
         } else {
           setError(data.message || "Failed to load S3 files");
