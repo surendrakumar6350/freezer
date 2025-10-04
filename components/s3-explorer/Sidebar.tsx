@@ -2,7 +2,6 @@ import { Separator } from "../ui/separator";
 import { ExternalLink } from "lucide-react";
 import { FileTree, S3Node } from "../../app/s3-explorer/FileTree";
 import React from "react";
-import { ThemeToggle } from "./ThemeToggle";
 
 export type SidebarProps = {
   tree: S3Node | null;
@@ -17,7 +16,6 @@ export function Sidebar({ tree, loading, error, onFileClick }: SidebarProps) {
       <div className="flex items-center justify-between mb-4">
         <span className="text-lg font-medium">Storage</span>
         <div className="flex gap-2 items-center">
-          <ThemeToggle />
           <ExternalLink className="w-4 h-4 text-muted-foreground" />
         </div>
       </div>

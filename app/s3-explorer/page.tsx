@@ -2,10 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 
-import { FileTree, buildTree, S3File, S3Node } from "./FileTree";
+import { buildTree, S3File, S3Node } from "./FileTree";
 import { FilePreview } from "./FilePreview";
 import { Sidebar } from "../../components/s3-explorer/Sidebar";
 import { WelcomeCard } from "../../components/s3-explorer/WelcomeCard";
+import { Header } from "@/components/header";
+import { PanelLeft, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function S3ExplorerPage() {
   const [files, setFiles] = useState<S3File[]>([]);
@@ -80,37 +83,87 @@ export default function S3ExplorerPage() {
     };
   }, []);
 
-  return (
-    <div className="min-h-screen bg-background flex flex-row">
-      {/* Sidebar */}
-      <div
-        className="relative border-r flex flex-col transition-all duration-200 h-screen max-h-screen order-1 bg-[var(--sidebar)]"
-        style={{ width: sidebarWidth }}
-      >
-        {/* Resizer */}
-        <div
-          className="absolute right-0 top-0 h-full w-1.5 cursor-col-resize z-10"
-          onMouseDown={() => (isDragging.current = true)}
-          style={{ userSelect: 'none' }}
-        />
-        {/* Sidebar Content */}
-        <div className="flex flex-col flex-1 min-h-0 p-4 pt-10">
-          <Sidebar tree={tree} loading={loading} error={error} onFileClick={handleFileClick} />
-        </div>
-      </div>
+  // Mobile sidebar open state
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-      {/* Main Content */}
-      <div className="flex-1 p-4 sm:p-6 lg:p-8 order-2">
-        {preview ? (
-          <FilePreview
-            url={preview.url}
-            name={preview.name}
-            isInline={true}
-            onClose={() => setPreview(null)}
+  // Close on Escape when mobile sidebar is open
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileOpen]);
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+      <div className="flex flex-row flex-1 min-h-0">
+        {/* Desktop Sidebar (md and up) */}
+        <div
+          className="relative border-r flex-col transition-all duration-200 order-1 bg-[var(--sidebar)] h-[calc(100vh-56px)] max-h-[calc(100vh-56px)] hidden md:flex"
+          style={{ width: sidebarWidth }}
+        >
+          {/* Resizer */}
+          <div
+            className="absolute right-0 top-0 h-full w-1.5 cursor-col-resize z-10"
+            onMouseDown={() => (isDragging.current = true)}
+            style={{ userSelect: 'none' }}
           />
-        ) : (
-          <WelcomeCard downloading={downloading} />
+          {/* Sidebar Content */}
+          <div className="flex flex-col flex-1 min-h-0 p-4 pt-10">
+            <Sidebar tree={tree} loading={loading} error={error} onFileClick={handleFileClick} />
+          </div>
+        </div>
+
+        {/* Mobile Sidebar (drawer) */}
+        {/* Overlay */}
+        {mobileOpen && (
+          <div
+            className="fixed inset-0 bg-black/40 z-30 md:hidden"
+            onClick={() => setMobileOpen(false)}
+            aria-hidden="true"
+          />
         )}
+        {/* Drawer */}
+        <div
+          className={`fixed z-40 md:hidden left-0 top-[56px] bottom-0 w-[85vw] max-w-xs bg-[var(--sidebar)] border-r transform transition-transform duration-200 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="File browser"
+        >
+          <div className="flex flex-col h-full p-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-base font-medium">Storage</span>
+              <Button variant="ghost" size="icon" onClick={() => setMobileOpen(false)} aria-label="Close files">
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <Sidebar tree={tree} loading={loading} error={error} onFileClick={(n) => { setMobileOpen(false); handleFileClick(n); }} />
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 p-4 sm:p-6 lg:p-8 order-2 min-h-0 h-[calc(100vh-56px)] overflow-auto">
+          {/* Mobile open sidebar button */}
+          <div className="md:hidden mb-3">
+            <Button variant="outline" size="sm" onClick={() => setMobileOpen(true)} aria-label="Open files">
+              <PanelLeft className="h-4 w-4 mr-2" />
+              Files
+            </Button>
+          </div>
+          {preview ? (
+            <FilePreview
+              url={preview.url}
+              name={preview.name}
+              isInline={true}
+              onClose={() => setPreview(null)}
+            />
+          ) : (
+            <WelcomeCard downloading={downloading} />
+          )}
+        </div>
       </div>
     </div>
   );

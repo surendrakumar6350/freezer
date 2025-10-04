@@ -29,13 +29,13 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `(() => {
+  // Default to dark for first-time visitors and environments where localStorage is unavailable
+  let dark = true;
   try {
     const stored = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const dark = stored ? stored === 'dark' : prefersDark;
-    if (dark) document.documentElement.classList.add('dark');
-    else document.documentElement.classList.remove('dark');
+    if (stored) dark = stored === 'dark';
   } catch {}
+  document.documentElement.classList.toggle('dark', dark);
 })();`,
           }}
         />
