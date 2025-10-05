@@ -82,13 +82,22 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // List objects in S3 bucket
-    const data = await s3.listObjectsV2({ Bucket: bucket }).promise();
-    const files = (data.Contents || []).map((obj) => ({
-      key: obj.Key,
-      size: obj.Size,
-      lastModified: obj.LastModified,
-    }));
+    // Only list objects under 'apna-College-DSA/'
+    const prefix = 'apna-College-DSA/';
+    const data = await s3.listObjectsV2({ Bucket: bucket, Prefix: prefix }).promise();
+    const files = (data.Contents || [])
+      .filter(obj => {
+        if (!obj.Key || !obj.Key.startsWith(prefix)) return false;
+        // Remove zero-byte objects with keys ending in '/' or with no name after last slash
+        const key = obj.Key;
+        if (obj.Size === 0 && (key.endsWith('/') || key.split('/').pop()?.trim() === '')) return false;
+        return true;
+      })
+      .map((obj) => ({
+        key: obj.Key,
+        size: obj.Size,
+        lastModified: obj.LastModified,
+      }));
     return NextResponse.json({ success: true, files });
   } catch (error) {
     // Log error and return server error
