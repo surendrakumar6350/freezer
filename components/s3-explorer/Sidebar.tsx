@@ -1,6 +1,5 @@
 "use client";
 
-import { Separator } from "../ui/separator";
 import {
   Search,
   ExternalLink,
@@ -8,8 +7,6 @@ import {
   Settings,
   Upload,
   Clock,
-  FileText,
-  Folder,
   RefreshCw
 } from "lucide-react";
 import { FileTree, S3Node } from "../../app/s3-explorer/FileTree";
@@ -17,7 +14,6 @@ import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
-import { Badge } from "../ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 export type SidebarProps = {
@@ -30,7 +26,7 @@ export type SidebarProps = {
 
 export function Sidebar({ tree, loading, error, onFileClick, compact = false }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<'files' | 'recent' | 'uploads'>('files');
+  const [activeTab] = useState<'files' | 'recent' | 'uploads'>('files');
 
   return (
     <aside className="h-full flex flex-col w-full bg-[var(--sidebar)] text-[var(--sidebar-foreground)]">
