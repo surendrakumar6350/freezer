@@ -1,31 +1,100 @@
+# Freezer 🧊
 
-# Freezer
+<div align="center">
+  
+![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3-38B2AC?style=for-the-badge&logo=tailwind-css)
+![AWS](https://img.shields.io/badge/AWS_S3-232F3E?style=for-the-badge&logo=amazon-aws)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
-Freezer is a modern Next.js app featuring:
+</div>
 
-- **Login system** with JWT authentication
-- **S3 File Explorer**: Browse, preview, and download files from your AWS S3 bucket
-  - Collapsible, recursive tree view (folders/files)
-  - File preview modal for images, videos, PDFs, and more
-  - Responsive, clean UI inspired by Google Drive/VS Code
+<p align="center">A sleek, modern S3 file explorer built with Next.js featuring JWT authentication and advanced file management capabilities.</p>
 
-## Features
+<div align="center">
+  <img width="90%" alt="Freezer S3 Explorer Interface" src="https://github.com/user-attachments/assets/843db007-c123-4d18-8bb7-abba4944b4cc" />
+</div>
 
-- Login page with token-based authentication
-- API endpoints for login and S3 file listing
-- Advanced file explorer with collapsible folders and file metadata
-- File preview modal (image, video, PDF, fallback for other types)
-- Uses TailwindCSS and lucide-react icons
+## ✨ Features
 
-## Security Features
+<div align="center">
+  <table>
+    <tr>
+      <td width="50%">
+        <h3 align="center">🔒 Secure Authentication</h3>
+        <ul>
+          <li>JWT-based token authentication</li>
+          <li>Per-IP and global rate limiting</li>
+          <li>Protection against service abuse</li>
+        </ul>
+      </td>
+      <td width="50%">
+        <h3 align="center">📁 S3 File Explorer</h3>
+        <ul>
+          <li>Collapsible, recursive tree view</li>
+          <li>File metadata display</li>
+          <li>Clean, responsive interface</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td width="50%">
+        <h3 align="center">👁️ File Preview</h3>
+        <ul>
+          <li>Support for images, videos, PDFs</li>
+          <li>Modal preview window</li>
+          <li>Fallback for unsupported file types</li>
+        </ul>
+      </td>
+      <td width="50%">
+        <h3 align="center">⚡ Performance</h3>
+        <ul>
+          <li>Built on Next.js 14 App Router</li>
+          <li>Optimized loading states</li>
+          <li>Responsive design for all devices</li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+</div>
 
-- **JWT-based Authentication**: Secure token-based authentication for all S3 operations
-- **Per-IP Rate Limiting**: Individual IP addresses are rate-limited to prevent spam (20 requests per 5 seconds by default)
-- **Global Rate Limiting**: Configurable global usage limit across all requests to prevent service abuse and DoS attacks
-  - Default: 1000 requests per 60 seconds across all users
-  - Configurable via `S3_GLOBAL_RATE_LIMIT` and `S3_GLOBAL_WINDOW_SEC` environment variables
-  - Returns HTTP 503 (Service Unavailable) when global limit is exceeded
-  - Logs all global rate limit violations for monitoring and analysis
+## 📸 Screenshots
+
+<div align="center">
+  <table>
+    <tr>
+      <td width="50%">
+        <img width="100%" alt="Login Screen" src="https://github.com/user-attachments/assets/a724adaf-dce0-417a-84b4-bc5a6062bd68" />
+        <p align="center"><strong>Secure Login Page</strong></p>
+      </td>
+      <td width="50%">
+        <img width="100%" alt="File Explorer" src="https://github.com/user-attachments/assets/e481f199-86fe-400b-837e-2adc2816118d" />
+        <p align="center"><strong>S3 File Explorer</strong></p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+## 🛡️ Security Features
+
+- **JWT Authentication**
+  - Secure token-based access for all S3 operations
+  - Configurable token expiration
+
+- **Advanced Rate Limiting**
+  - **Per-IP Protection**: 20 requests per 5 seconds (default)
+  - **Global Protection**: 1000 requests per 60 seconds across all users
+  - Configurable via environment variables
+  - Security violation logging and monitoring
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- AWS S3 bucket and credentials
+- Upstash Redis account (for rate limiting)
+  
 
 ## Getting Started
 
@@ -44,20 +113,3 @@ Freezer is a modern Next.js app featuring:
 	npm run dev
 	```
 
-## Usage
-
-- Visit `/login` to sign in
-- Visit `/s3-explorer` to browse your S3 bucket
-  - Click folders to expand/collapse
-  - Click files to preview (image, video, PDF, etc.) or download
-
-## Tech Stack
-
-- Next.js 14 (App Router)
-- TailwindCSS
-- AWS SDK
-- lucide-react (icons)
-
-## License
-
-MIT
