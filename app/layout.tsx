@@ -29,13 +29,21 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `(() => {
-  // Default to dark for first-time visitors and environments where localStorage is unavailable
   let dark = true;
   try {
     const stored = localStorage.getItem('theme');
-    if (stored) dark = stored === 'dark';
+    if (stored === 'dark') dark = true;
+    else if (stored === 'light') dark = false;
+    else if (window.matchMedia) dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   } catch {}
-  document.documentElement.classList.toggle('dark', dark);
+  const root = document.documentElement;
+  if (dark) root.classList.add('dark'); else root.classList.remove('dark');
+  try {
+    // Hint to UA for form controls etc.
+    let meta = document.querySelector('meta[name="color-scheme"]');
+    if (!meta) { meta = document.createElement('meta'); meta.setAttribute('name','color-scheme'); document.head.appendChild(meta); }
+    meta.setAttribute('content', dark ? 'dark light' : 'light dark');
+  } catch {}
 })();`,
           }}
         />

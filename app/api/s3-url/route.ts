@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     }
     try {
       jwt.verify(token, getJwtSecret());
-    } catch (err) {
+    } catch {
       return NextResponse.json({ success: false, message: "Invalid or expired token." }, { status: 401 });
     }
     // Parse query params
