@@ -48,3 +48,37 @@ export async function rateLimit(key: string, limit: number, windowSec: number): 
         return true; // Fail open
     }
 }
+
+/**
+ * Global rate limiting for S3 APIs to prevent abuse across all users.
+ * Uses a single Redis key to track all requests globally.
+ * @param apiName Name of the API (e.g., 's3', 's3url')
+ * @param limit Max number of requests allowed globally within the time window
+ * @param windowSec Time window in seconds
+ * @returns `true` if allowed, `false` if global rate limit exceeded
+ */
+export async function globalRateLimit(apiName: string, limit: number, windowSec: number): Promise<boolean> {
+    const nowMs = Date.now();
+    const windowStartMs = nowMs - windowSec * 1000;
+    const k = `rl:global:${apiName}`;
+    try {
+        // Remove old entries
+        await upstashFetch(["ZREMRANGEBYSCORE", k, "0", windowStartMs.toString()]);
+        // Count current requests
+        const zcardRes = await upstashFetch(["ZCARD", k]);
+        const requestCount = Number(zcardRes.result ?? 0);
+        if (requestCount >= limit) {
+            console.warn(`Global rate limit exceeded for ${apiName}. Current: ${requestCount}, Limit: ${limit}`);
+            return false;
+        }
+        // Add new request
+        const member = `${nowMs}-${Math.random().toString(36).slice(2, 8)}`;
+        await upstashFetch(["ZADD", k, nowMs.toString(), member]);
+        // Set expiry
+        await upstashFetch(["EXPIRE", k, windowSec.toString()]);
+        return true;
+    } catch (error) {
+        console.error("Global rate limiting error:", error);
+        return true; // Fail open
+    }
+}

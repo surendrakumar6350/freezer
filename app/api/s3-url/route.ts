@@ -3,13 +3,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import AWS from "aws-sdk";
 import { headers } from "next/headers";
-import { rateLimit } from "@/lib/rateLimiter";
+import { rateLimit, globalRateLimit } from "@/lib/rateLimiter";
 import jwt from "jsonwebtoken";
 
 
 // Rate limit config
 const RATE_LIMIT = 20;
 const WINDOW_SEC = 5;
+
+// Global rate limit config (configurable via environment variables)
+const GLOBAL_RATE_LIMIT = parseInt(process.env.S3_GLOBAL_RATE_LIMIT || "1000", 10);
+const GLOBAL_WINDOW_SEC = parseInt(process.env.S3_GLOBAL_WINDOW_SEC || "60", 10);
 
 // JWT secret helper (consistent with other routes)
 function getJwtSecret(): string {
@@ -64,6 +68,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { success: false, message: "Unable to determine IP address." },
         { status: 400 }
+      );
+    }
+
+    // Global rate limiting check (applies to all requests)
+    const globalAllowed = await globalRateLimit("s3url", GLOBAL_RATE_LIMIT, GLOBAL_WINDOW_SEC);
+    if (!globalAllowed) {
+      console.error(`[S3URL] Global rate limit exceeded. IP: ${ip}`);
+      return NextResponse.json(
+        { success: false, message: "Service temporarily unavailable due to high demand. Please try again later." },
+        { status: 503, headers: { "Retry-After": String(GLOBAL_WINDOW_SEC) } }
       );
     }
 
