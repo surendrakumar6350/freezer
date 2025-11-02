@@ -96,22 +96,44 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Only list objects under 'apna-College-DSA/'
-    const prefix = 'apna-College-DSA/';
-    const data = await s3.listObjectsV2({ Bucket: bucket, Prefix: prefix }).promise();
-    const files = (data.Contents || [])
-      .filter(obj => {
-        if (!obj.Key || !obj.Key.startsWith(prefix)) return false;
-        // Remove zero-byte objects with keys ending in '/' or with no name after last slash
+    // Allowed prefixes to return. By default include both folders.
+    // Can be overridden with comma-separated S3_ALLOWED_PREFIXES env var.
+    const prefixes = (process.env.S3_ALLOWED_PREFIXES || 'apna-College-DSA/,hkirat-1-and-2/')
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean);
+
+    // Fetch objects for each prefix in parallel and combine results.
+    const listPromises = prefixes.map((prefix) =>
+      s3.listObjectsV2({ Bucket: bucket, Prefix: prefix }).promise().then((res) => ({ prefix, contents: res.Contents || [] }))
+    );
+
+    const lists = await Promise.all(listPromises);
+
+    // Flatten, filter empty/placeholder objects and dedupe by key
+    const allObjects = lists
+      .flatMap(({ prefix, contents }) =>
+        contents.map((obj) => ({ prefix, obj }))
+      )
+      .filter(({ prefix, obj }) => {
+        if (!obj.Key) return false;
+        // Extra safety: ensure key starts with the expected prefix
+        if (!obj.Key.startsWith(prefix)) return false;
         const key = obj.Key;
+        // Remove zero-byte objects that are folder placeholders or empty names
         if (obj.Size === 0 && (key.endsWith('/') || key.split('/').pop()?.trim() === '')) return false;
         return true;
       })
-      .map((obj) => ({
-        key: obj.Key,
-        size: obj.Size,
-        lastModified: obj.LastModified,
-      }));
+      .map(({ obj }) => ({ key: obj.Key as string, size: obj.Size, lastModified: obj.LastModified }));
+
+    // Deduplicate by key (in case of overlaps)
+    const deduped: Record<string, { key: string; size?: number; lastModified?: Date }> = {};
+    for (const o of allObjects) {
+      deduped[o.key] = o;
+    }
+
+    const files = Object.values(deduped);
+
     return NextResponse.json({ success: true, files });
   } catch (error) {
     // Log error and return server error
