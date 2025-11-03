@@ -23,9 +23,9 @@
 
 <br />
 
-<div align="center">
+<!-- <div align="center">
   <img width="90%" alt="Freezer S3 Explorer Interface" src="https://github.com/user-attachments/assets/843db007-c123-4d18-8bb7-abba4944b4cc" />
-</div>
+</div> -->
 
 ## ✨ Features
 
