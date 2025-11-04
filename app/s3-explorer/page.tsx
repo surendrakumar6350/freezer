@@ -16,6 +16,7 @@ export default function S3ExplorerPage() {
   const [error, setError] = useState("");
   const [downloading, setDownloading] = useState(false);
   const [preview, setPreview] = useState<{ url: string; name: string; mimeType?: string } | null>(null);
+  const [selectedPath, setSelectedPath] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/s3")
@@ -41,6 +42,7 @@ export default function S3ExplorerPage() {
       const data = await res.json();
       if (data.success && data.url) {
         setPreview({ url: data.url, name: node.name });
+        setSelectedPath(node.path);
       } else {
         alert(data.message || "Failed to get file URL");
       }
@@ -140,6 +142,7 @@ export default function S3ExplorerPage() {
               error={error} 
               onFileClick={handleFileClick}
               compact={sidebarWidth < 280}
+              activePath={selectedPath}
             />
           </div>
         </div>
@@ -176,6 +179,7 @@ export default function S3ExplorerPage() {
               loading={loading} 
               error={error} 
               onFileClick={(n) => { setMobileOpen(false); handleFileClick(n); }}
+              activePath={selectedPath}
             />
           </div>
         </div>
