@@ -22,9 +22,10 @@ export type SidebarProps = {
   error: string;
   onFileClick: (node: S3Node) => void;
   compact?: boolean; // when true, render icon-only, space-saving UI
+  activePath?: string | null;
 };
 
-export function Sidebar({ tree, loading, error, onFileClick, compact = false }: SidebarProps) {
+export function Sidebar({ tree, loading, error, onFileClick, compact = false, activePath }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab] = useState<'files' | 'recent' | 'uploads'>('files');
 
@@ -94,7 +95,7 @@ export function Sidebar({ tree, loading, error, onFileClick, compact = false }: 
         ) : tree ? (
           <div>
             {activeTab === 'files' && (
-              <FileTree tree={tree} onFileClick={onFileClick} query={searchQuery} />
+              <FileTree tree={tree} onFileClick={onFileClick} query={searchQuery} activePath={activePath} />
             )}
             {activeTab === 'recent' && (
               <div className="px-2 py-4 text-center text-sm text-muted-foreground">

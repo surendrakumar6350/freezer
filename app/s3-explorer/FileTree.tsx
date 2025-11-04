@@ -67,17 +67,18 @@ export type FileTreeProps = {
   tree: S3Node;
   onFileClick: (node: S3Node) => void;
   query?: string;
+  activePath?: string | null;
 };
 
-export const FileTree: React.FC<FileTreeProps> = ({ tree, onFileClick, query }) => {
+export const FileTree: React.FC<FileTreeProps> = ({ tree, onFileClick, query, activePath }) => {
   return (
     <div className="w-full">
-      <TreeNode node={tree} onFileClick={onFileClick} level={0} query={query} />
+      <TreeNode node={tree} onFileClick={onFileClick} level={0} query={query} activePath={activePath} />
     </div>
   );
 };
 
-function TreeNode({ node, onFileClick, level, query }: { node: S3Node; onFileClick: (node: S3Node) => void; level: number; query?: string }) {
+function TreeNode({ node, onFileClick, level, query, activePath }: { node: S3Node; onFileClick: (node: S3Node) => void; level: number; query?: string; activePath?: string | null }) {
   const [open, setOpen] = useState(level === 0);
   const q = (query || '').toLowerCase();
   const matches = node.name.toLowerCase().includes(q);
@@ -111,16 +112,20 @@ function TreeNode({ node, onFileClick, level, query }: { node: S3Node; onFileCli
         console.log('Delete', node.path);
       }
     };
+    const isActive = !!activePath && node.path === activePath;
+
     return (
       <ContextMenu>
         <ContextMenuTrigger>
           <div
             className={cn(
               // subtle zebra rows + hover polish
-              "group flex items-center px-2 sm:px-3 py-1.5 cursor-pointer rounded-md transition-all duration-200 odd:bg-sidebar-accent/10 hover:bg-sidebar-accent/50 hover:shadow-sm active:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+              "group flex items-center px-2 sm:px-3 py-1.5 cursor-pointer rounded-md transition-all duration-200 odd:bg-sidebar-accent/10 hover:bg-sidebar-accent/50 hover:shadow-sm active:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+              isActive && 'bg-sidebar-primary/20 ring-2 ring-sidebar-ring'
             )}
             onClick={() => onFileClick(node)}
             tabIndex={0}
+            aria-current={isActive ? 'true' : undefined}
           >
             <div className="flex items-center min-w-0 flex-1">
               <File className={cn('w-4 h-4 shrink-0', getFileIconColor())} />
@@ -243,13 +248,13 @@ function TreeNode({ node, onFileClick, level, query }: { node: S3Node; onFileCli
             return (
               <>
                 {folders.map((child) => (
-                  <TreeNode key={child.path} node={child} onFileClick={onFileClick} level={level + 1} query={query} />
+                  <TreeNode key={child.path} node={child} onFileClick={onFileClick} level={level + 1} query={query} activePath={activePath} />
                 ))}
                 {folders.length > 0 && files.length > 0 && (
                   <div className="my-1 h-px bg-sidebar-border/40" />
                 )}
                 {files.map((child) => (
-                  <TreeNode key={child.path} node={child} onFileClick={onFileClick} level={level + 1} query={query} />
+                  <TreeNode key={child.path} node={child} onFileClick={onFileClick} level={level + 1} query={query} activePath={activePath} />
                 ))}
               </>
             );
