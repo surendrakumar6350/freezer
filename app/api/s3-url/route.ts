@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
       const url = s3.getSignedUrl("getObject", {
         Bucket: bucket,
         Key: key,
-        Expires: 60 * 15, // 5 minutes
+        Expires: 60 * 115, // 115 minutes
       });
       return NextResponse.json({ success: true, url });
     } catch (error) {
